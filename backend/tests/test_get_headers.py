@@ -26,11 +26,8 @@ def test_get_headers():
     # Verifica que la clave 'headers' esté en la respuesta
     assert "headers" in data, f"No se encontró 'headers' en la respuesta: {data}"
 
-    # Verifica los headers esperados según el archivo de test
-    expected_headers = [
-        "StartDate", "RecordedDate", "ResponseId", "ORIGEN", "Q_TerminateFlag", "ETAPA", "ID",
-        "TIPO", "EDAD", "EDAD_COD", "FILTRO", "CUOTAFULL", "F11-EMPRESARIAL", "suma_eval"
-    ]
+    # Verifica los headers esperados según el archivo de test actual
+    expected_headers = ["Nombre", "Ciudad", "Edad", "Departamento"]
     assert data["headers"] == expected_headers, f"Headers inesperados: {data['headers']}\nEsperados: {expected_headers}"
 
     # Comentario: Si este test falla, revisar el endpoint /get_headers/{file_id} y el archivo de test.

@@ -15,18 +15,18 @@ def test_download_files():
     assert upload_response.status_code == 200
     file_id = upload_response.json()["file_id"]
 
-    # Setear header para dividir
-    response = client.post(f"/set_header_to_split/{file_id}", json={"header": "ORIGEN"})
+    # Setear header para dividir usando una columna que existe en el test file
+    response = client.post(f"/set_header_to_split/{file_id}", json={"header": "Ciudad"})
     assert response.status_code == 200
     unique_values = response.json()["unique_values_in_header_to_split"]
 
-    # Setear columnas a mantener
-    response = client.post(f"/set_headers_to_keep/{file_id}", json={"headers": ["ORIGEN", "ID"]})
+    # Setear columnas a mantener usando columnas que existen en el test file
+    response = client.post(f"/set_headers_to_keep/{file_id}", json={"headers": ["Nombre", "Ciudad", "Edad"]})
     assert response.status_code == 200
 
-    # Setear valores a mantener para el header
-    values_to_keep = [v for v in unique_values if v in ("GURUS", "TAP")]
-    response = client.post(f"/set_values_to_keep_by_header/{file_id}", json={"header": "ORIGEN", "values": values_to_keep})
+    # Setear valores a mantener para el header - usar las ciudades reales del test data
+    values_to_keep = [v for v in unique_values if v in ("Madrid", "Barcelona")]
+    response = client.post(f"/set_values_to_keep_by_header/{file_id}", json={"header": "Ciudad", "values": values_to_keep})
     assert response.status_code == 200
 
     # Descargar el zip

@@ -23,10 +23,12 @@ dist/
 .DS_Store
 Thumbs.db
 
-# Excel/CSV temporales
+# Excel/CSV temporales (keep test file)
 *.xlsx
 *.xls
 *.csv
+# Exception for test files
+!backend/tests/*.xlsx
 
 # Otros
 *.zip
@@ -47,4 +49,6 @@ frontend/.angular/
 frontend/tmp/
 frontend/out-tsc/
 frontend/.angular/cache
-package-lock.json
+
+# Environment variables
+.env

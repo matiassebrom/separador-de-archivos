@@ -17,17 +17,17 @@ def test_set_headers_to_keep():
     assert upload_response.status_code == 200, f"Status inesperado al subir archivo: {upload_response.status_code}, body: {upload_response.text}"
     file_id = upload_response.json()["file_id"]
 
-    # Probar set_headers_to_keep con un solo header
-    response = client.post(f"/set_headers_to_keep/{file_id}", json={"headers": ["ORIGEN"]})
+    # Probar set_headers_to_keep con un solo header que existe en el test file
+    response = client.post(f"/set_headers_to_keep/{file_id}", json={"headers": ["Ciudad"]})
     assert response.status_code == 200, f"Status inesperado al setear headers: {response.status_code}, body: {response.text}"
     data = response.json()
 
     # Verifica que la clave esté en la respuesta
     assert "unique_values" in data, f"No se encontró 'unique_values' en la respuesta: {data}"
 
-    # Debe devolver solo los headers enviados
-    expected_values = {"ORIGEN"}
-    assert set(data["unique_values"]) == expected_values, f"Valores únicos inesperados: {data['unique_values']}\nEsperados: {expected_values}"
+    # Debe devolver los headers enviados
+    expected_values = ["Ciudad"]
+    assert data["unique_values"] == expected_values, f"Valores inesperados: {data['unique_values']}\nEsperados: {expected_values}"
 
     # Comentario: Si este test falla, revisar el endpoint /set_headers_to_keep/{file_id} y la lógica de filtrado.
 
@@ -43,11 +43,11 @@ def test_set_headers_to_keep_multiple():
     assert upload_response.status_code == 200, f"Status inesperado al subir archivo: {upload_response.status_code}, body: {upload_response.text}"
     file_id = upload_response.json()["file_id"]
 
-    # Probar con varios headers
-    headers = ["ORIGEN", "ID", "TIPO"]
+    # Probar con varios headers que existen en el test file
+    headers = ["Nombre", "Ciudad", "Departamento"]
     response = client.post(f"/set_headers_to_keep/{file_id}", json={"headers": headers})
     assert response.status_code == 200, f"Status inesperado al setear headers: {response.status_code}, body: {response.text}"
     data = response.json()
     assert "unique_values" in data, f"No se encontró 'unique_values' en la respuesta: {data}"
-    assert set(data["unique_values"]) == set(headers), f"Valores únicos inesperados: {data['unique_values']}\nEsperados: {set(headers)}"
+    assert set(data["unique_values"]) == set(headers), f"Valores inesperados: {data['unique_values']}\nEsperados: {set(headers)}"
     # Comentario: Si este test falla, revisar el endpoint y la lógica de retorno de headers.
