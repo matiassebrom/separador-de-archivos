@@ -56,10 +56,10 @@ app = FastAPI()
 # Permitir CORS para desarrollo
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Cambia esto a la URL de tu frontend en producción
+    allow_origins=["http://localhost:4200"],  # Restrict to frontend URL
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type"],
 )
 
 @app.get("/")

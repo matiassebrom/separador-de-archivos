@@ -3,3 +3,6 @@ uvicorn[standard]>=0.29
 pandas
 openpyxl
 python-multipart
+# Testing dependencies
+pytest>=7.0.0
+httpx>=0.24.0

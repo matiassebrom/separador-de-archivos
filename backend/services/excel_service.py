@@ -30,11 +30,11 @@ class FileData(TypedDict, total=False):
     df: pd.DataFrame
     filename: str
     header_to_split: Optional[str]
-    header_to_filter: Optional[str]  # Nuevo campo
     headers_to_keep: Optional[list[str]]
     # Paso 3: filtro independiente
     header_to_filter: Optional[str]
     values_to_keep_by_header: Optional[dict[str, list]]
+    base_name: Optional[str]
 
 file_store: Dict[str, FileData] = {}
 
@@ -46,15 +46,32 @@ def save_uploaded_file(file: UploadFile) -> str:
     """
     if not file.filename or not (file.filename.endswith('.xlsx') or file.filename.endswith('.xls')):
         raise HTTPException(status_code=400, detail="El archivo debe ser de tipo Excel (.xlsx o .xls)")
+    
+    # Read file content
     contents = file.file.read()
     if not contents:
         raise HTTPException(status_code=400, detail="El archivo está vacío")
+    
+    # Check file size (limit to 10MB)
+    max_size = 10 * 1024 * 1024  # 10MB in bytes
+    if len(contents) > max_size:
+        raise HTTPException(status_code=400, detail="El archivo es demasiado grande (máximo 10MB)")
+    
     try:
         df = pd.read_excel(io.BytesIO(contents))
+        if df.empty:
+            raise HTTPException(status_code=400, detail="El archivo Excel está vacío")
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error al leer el archivo Excel: {str(e)}")
+    
+    # Generate unique file ID
     file_id = str(int(time.time() * 1000))
-    file_store[file_id] = {"df": df, "filename": file.filename, "header_to_split": None, "headers_to_keep": None}
+    file_store[file_id] = {
+        "df": df, 
+        "filename": file.filename, 
+        "header_to_split": None, 
+        "headers_to_keep": None
+    }
     return file_id
 
 
@@ -70,18 +87,24 @@ def set_header_to_split(file_id: str, header: str) -> list:
     return unique_values_in_header_to_split
 
 
-# ==================== PASO 2: ELEGIR 'SEPARAR POR' ====================
-def get_headers_by_id(file_id: str):
+def get_headers_by_id(file_id: str) -> list[str]:
+    """Get column headers from uploaded file"""
+    if file_id not in file_store:
+        raise HTTPException(status_code=404, detail="ID de archivo no encontrado")
     df = file_store[file_id]["df"]
     return list(df.columns)
 
 
-# ==================== PASO 3: OBTENER VALORES ÚNICOS DE UNA COLUMNA ====================
-def get_unique_values_by_header(file_id: str, header: str):
-    # Se asume que file_id y header ya fueron validados
+def get_unique_values_by_header(file_id: str, header: str) -> list[str]:
+    """Get unique values from a specific column"""
+    if file_id not in file_store:
+        raise HTTPException(status_code=404, detail="ID de archivo no encontrado")
     df = file_store[file_id]["df"]
+    if header not in df.columns:
+        raise HTTPException(status_code=400, detail=f"Header '{header}' no está en la lista de headers")
     unique_values = df[header].dropna().unique().tolist()
-    return unique_values
+    # Convert to strings to ensure JSON serialization
+    return [str(val) for val in unique_values]
 
 
 # ==================== PASO 4: ELEGIR 'DATOS A GUARDAR' ====================
@@ -107,18 +130,21 @@ def set_headers_to_keep(file_id: str, headers: list[str]) -> list:
     return []
 
 
-# ==================== PASO 3: CONFIGURAR FILTROS (OPCIONAL) ====================
 def set_values_to_keep_by_header(file_id: str, header: str, values: list) -> list:
     if file_id not in file_store:
         raise HTTPException(status_code=404, detail="ID de archivo no encontrado")
     all_headers = get_headers_by_id(file_id)
     if header not in all_headers:
         raise HTTPException(status_code=400, detail=f"Header '{header}' no está en la lista de headers")
+    
+    # Validate that values is not empty
+    if not values:
+        raise HTTPException(status_code=400, detail="La lista de valores no puede estar vacía")
+    
     # Guardar header_to_filter y los valores a mantener
     file_store[file_id]["header_to_filter"] = header
     if "values_to_keep_by_header" not in file_store[file_id] or file_store[file_id]["values_to_keep_by_header"] is None:
         file_store[file_id]["values_to_keep_by_header"] = {}
-    file_store[file_id]["header_to_filter"] = header  # Guardar header a filtrar
     file_store[file_id]["values_to_keep_by_header"][header] = values
     return values
 
