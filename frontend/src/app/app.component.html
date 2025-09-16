@@ -1,13 +1,13 @@
 <!-- Split & Filter Excel App -->
 <div class="app-container">
-	<mat-card class="header-card">
-		<mat-card-header>
-			<mat-card-title>🗂️ Split & Filter Excel</mat-card-title>
-			<mat-card-subtitle>Flujo por etapas para dividir y filtrar archivos Excel</mat-card-subtitle>
-		</mat-card-header>
-	</mat-card>
+	<div class="header-card">
+		<div class="header-content">
+			<h1 class="header-title">🗂️ Split & Filter Excel</h1>
+			<p class="header-subtitle">Flujo por etapas para dividir y filtrar archivos Excel</p>
+		</div>
+	</div>
 
-	<mat-accordion class="steps-accordion">
+	<div class="steps-accordion">
 		<!-- ==================== PASO 1: SUBIR ARCHIVO ==================== -->
 		<app-step1-upload [fileUploaded]="fileUploaded" (fileUpload)="onFileUpload()"> </app-step1-upload>
 
@@ -45,5 +45,5 @@
 			[isStepCompleted]="isStepCompleted(5)"
 			(nextStep)="nextStep()"
 		></app-step5-download>
-	</mat-accordion>
+	</div>
 </div>
