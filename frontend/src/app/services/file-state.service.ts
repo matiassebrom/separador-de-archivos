@@ -6,51 +6,72 @@ export interface UploadedFileInfo {
 	message: string;
 }
 
+export interface FilterConfig {
+	header: string;
+	values: string[];
+}
+
 @Injectable({
 	providedIn: 'root'
 })
 export class FileStateService {
-	// 🎯 Signal que guarda la información del archivo
+	// Información del archivo
 	private uploadedFile = signal<UploadedFileInfo | null>(null);
 
-	// 🎯 Signal para los headers del archivo
+	// Filas del archivo (datos crudos)
+	private _rows = signal<Record<string, any>[]>([]);
+	rows = computed(() => this._rows());
+
+	// Headers del archivo
 	private _headers = signal<string[]>([]);
 	headers = computed(() => this._headers());
 
-	// 📖 Computed signals para acceder a la información
+	// Columna por la que se separa
+	private _separateBy = signal<string>('');
+	separateBy = computed(() => this._separateBy());
+
+	// Filtro de filas (opcional)
+	private _filter = signal<FilterConfig | null>(null);
+	filter = computed(() => this._filter());
+
+	// Columnas a mantener en la salida
+	private _keepCols = signal<string[]>([]);
+	keepCols = computed(() => this._keepCols());
+
+	// Computed signals
 	fileId = computed(() => this.uploadedFile()?.file_id ?? null);
 	filename = computed(() => this.uploadedFile()?.filename ?? null);
 	hasFile = computed(() => this.uploadedFile() !== null);
 
-	// 💾 Método para guardar la respuesta del upload
-	setUploadedFile(fileInfo: UploadedFileInfo) {
-		this.uploadedFile.set(fileInfo);
-		// Quitar la extensión si existe
-		const nameWithoutExt = fileInfo.filename.replace(/\.[^/.]+$/, '');
-		this.setBaseName(nameWithoutExt);
-		console.log('📁 Archivo guardado:', fileInfo);
-	}
-
-	// Método para guardar los headers
-	setHeaders(headers: string[]) {
-		this._headers.set(headers);
-		console.log('📋 Headers guardados:', headers);
-	}
-
-	// 🗑️ Método para limpiar el estado
-	clearFile() {
-		this.uploadedFile.set(null);
-		this._headers.set([]);
-	}
-
-	// 📋 Método para obtener el file_id actual
-	getCurrentFileId(): string | null {
-		return this.fileId();
-	}
-
-	// Signal para el nombre base de los archivos
+	// Nombre base para los archivos de salida
 	private _baseName = signal<string>('');
 	baseName = computed(() => this._baseName());
+
+	setUploadedFile(fileInfo: UploadedFileInfo) {
+		this.uploadedFile.set(fileInfo);
+		const nameWithoutExt = fileInfo.filename.replace(/\.[^/.]+$/, '');
+		this.setBaseName(nameWithoutExt);
+	}
+
+	setRows(rows: Record<string, any>[]) {
+		this._rows.set(rows);
+	}
+
+	setHeaders(headers: string[]) {
+		this._headers.set(headers);
+	}
+
+	setSeparateBy(header: string) {
+		this._separateBy.set(header);
+	}
+
+	setFilter(filter: FilterConfig | null) {
+		this._filter.set(filter);
+	}
+
+	setKeepCols(cols: string[]) {
+		this._keepCols.set(cols);
+	}
 
 	setBaseName(name: string) {
 		this._baseName.set(name);
@@ -58,5 +79,19 @@ export class FileStateService {
 
 	getBaseName(): string {
 		return this._baseName();
+	}
+
+	getCurrentFileId(): string | null {
+		return this.fileId();
+	}
+
+	clearFile() {
+		this.uploadedFile.set(null);
+		this._rows.set([]);
+		this._headers.set([]);
+		this._separateBy.set('');
+		this._filter.set(null);
+		this._keepCols.set([]);
+		this._baseName.set('');
 	}
 }

@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { ApiService } from './services/api.service';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -45,21 +44,11 @@ import { Step5DownloadComponent } from './components/steps/step5-download/step5-
 	templateUrl: './app.component.html',
 	styleUrl: './app.component.scss'
 })
-export class AppComponent implements OnInit {
-	constructor(private api: ApiService) {}
+export class AppComponent {
 	selectedColumnsMap: Record<string, boolean> = {};
-
 	title = 'split-excel-frontend';
 	currentStep = 1;
 	fileUploaded = false;
-
-	ngOnInit() {
-		// Llamar al backend al iniciar la app
-		this.api.pingBackend().subscribe({
-			next: (resp) => console.log('Respuesta backend:', resp),
-			error: (err) => console.error('Error backend:', err)
-		});
-	}
 
 	nextStep() {
 		if (this.currentStep < 5) {

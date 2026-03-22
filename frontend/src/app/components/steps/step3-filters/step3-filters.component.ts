@@ -1,16 +1,6 @@
-import {
-	Component,
-	Input,
-	Output,
-	EventEmitter,
-	OnInit,
-	OnChanges,
-	SimpleChanges,
-	signal,
-	effect
-} from '@angular/core';
-import { ApiService } from '../../../services/api.service';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { FileStateService } from '../../../services/file-state.service';
+import { LocalExcelService } from '../../../services/local-excel.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -46,10 +36,8 @@ export class Step3FiltersComponent implements OnInit, OnChanges {
 	@Output() nextStep = new EventEmitter<void>();
 
 	columnValues: string[] = [];
-
 	selectedFilterColumn: string = '';
 	selectedColumnValues: string[] = [];
-
 	headerSearchTerm: string = '';
 	searchTerm = '';
 
@@ -58,57 +46,37 @@ export class Step3FiltersComponent implements OnInit, OnChanges {
 		return this.columnValues.filter((v) => v && v.toLowerCase().includes(this.searchTerm.toLowerCase()));
 	}
 
-	constructor(
-		private api: ApiService,
-		public fileStateService: FileStateService
-	) {
-		// Ya no es necesario cargar headers, se obtienen del FileStateService
-	}
-
-	ngOnInit() {}
-
-	ngOnChanges(changes: SimpleChanges) {
-		// Ya no es necesario cargar headers aquí
-	}
-
 	get filteredHeaders(): string[] {
 		const headers = this.fileStateService.headers();
 		if (!this.headerSearchTerm) return headers;
 		return (headers || []).filter((h: string) => h && h.toLowerCase().includes(this.headerSearchTerm.toLowerCase()));
 	}
 
+	constructor(
+		public fileStateService: FileStateService,
+		private localExcel: LocalExcelService
+	) {}
+
+	ngOnInit() {}
+
+	ngOnChanges(changes: SimpleChanges) {}
+
 	onFilterColumnChange(header: string) {
 		this.selectedFilterColumn = header;
-		const fileId = this.fileStateService.getCurrentFileId();
-		// Llamar al backend solo si hay fileId y header seleccionado
-		if (fileId && header) {
-			this.api.getUniqueValues(fileId, header).subscribe({
-				next: (resp) => {
-					this.columnValues = resp.unique_values;
-					console.log('Valores únicos recibidos:', resp.unique_values);
-				},
-				error: (err) => {
-					console.error('Error setHeadersToKeep:', err);
-				}
-			});
-		}
+		const rows = this.fileStateService.rows();
+		this.columnValues = this.localExcel.getUniqueValues(rows, header);
 	}
 
 	onContinue() {
-		const fileId = this.fileStateService.getCurrentFileId();
-		if (fileId && this.selectedFilterColumn && this.selectedColumnValues.length > 0) {
-			this.api.setValuesToKeepByHeader(fileId, this.selectedFilterColumn, this.selectedColumnValues).subscribe({
-				next: (resp) => {
-					console.log('Valores enviados y guardados:', resp);
-					this.nextStep.emit();
-				},
-				error: (err) => {
-					console.error('Error setValuesToKeepByHeader:', err);
-				}
+		if (this.selectedFilterColumn && this.selectedColumnValues.length > 0) {
+			this.fileStateService.setFilter({
+				header: this.selectedFilterColumn,
+				values: this.selectedColumnValues
 			});
 		} else {
-			this.nextStep.emit();
+			this.fileStateService.setFilter(null);
 		}
+		this.nextStep.emit();
 	}
 
 	isColumnValueSelected(value: string): boolean {
@@ -120,7 +88,6 @@ export class Step3FiltersComponent implements OnInit, OnChanges {
 			this.selectedColumnValues = this.selectedColumnValues.filter((v) => v !== value);
 		} else {
 			this.selectedColumnValues = [...this.selectedColumnValues, value];
-			console.log('Valor de filtrado agregado:', value, this.selectedColumnValues);
 		}
 	}
 
@@ -130,5 +97,6 @@ export class Step3FiltersComponent implements OnInit, OnChanges {
 		this.headerSearchTerm = '';
 		this.searchTerm = '';
 		this.columnValues = [];
+		this.fileStateService.setFilter(null);
 	}
 }

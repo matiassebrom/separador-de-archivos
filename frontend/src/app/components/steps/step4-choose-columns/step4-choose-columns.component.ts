@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, signal, effect, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -9,7 +9,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { MatChipsModule } from '@angular/material/chips';
-import { ApiService } from '../../../services/api.service';
 import { FileStateService } from '../../../services/file-state.service';
 
 @Component({
@@ -38,13 +37,9 @@ export class Step4ChooseColumnsComponent {
 
 	selectedColumn: string = '';
 	selectedColumns: string[] = [];
-
 	headerSearchTerm: string = '';
 
-	constructor(
-		private api: ApiService,
-		public fileStateService: FileStateService
-	) {}
+	constructor(public fileStateService: FileStateService) {}
 
 	get filteredHeaders(): string[] {
 		const headers = this.fileStateService.headers();
@@ -67,19 +62,8 @@ export class Step4ChooseColumnsComponent {
 	}
 
 	onContinue() {
-		const fileId = this.fileStateService.fileId();
-		if (!fileId || this.selectedColumns.length === 0) {
-			return;
-		}
-		this.api.setHeadersToKeep(fileId, this.selectedColumns).subscribe({
-			next: (resp) => {
-				console.log('Headers guardados en backend:', resp);
-				this.nextStep.emit();
-			},
-			error: (err) => {
-				console.error('Error al guardar headers en backend:', err);
-				this.nextStep.emit(); // Emitir igual para no bloquear el flujo
-			}
-		});
+		if (this.selectedColumns.length === 0) return;
+		this.fileStateService.setKeepCols(this.selectedColumns);
+		this.nextStep.emit();
 	}
 }
