@@ -48,3 +48,9 @@ frontend/tmp/
 frontend/out-tsc/
 frontend/.angular/cache
 package-lock.json
+
+# Next.js
+frontend-next/node_modules/
+frontend-next/.next/
+frontend-next/tsconfig.tsbuildinfo
+frontend-next/next-env.d.ts
