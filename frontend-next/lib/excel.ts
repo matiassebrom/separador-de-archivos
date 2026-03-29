@@ -1,5 +1,6 @@
 // Este archivo solo corre en el browser (importado desde Client Components)
 import * as XLSX from 'xlsx';
+import { ExcelRow } from './types';
 
 /**
  * Lee un archivo Excel y retorna los headers y filas como objetos.
@@ -8,7 +9,7 @@ import * as XLSX from 'xlsx';
 export function readFile(
   file: File,
   onProgress?: (percent: number) => void,
-): Promise<{ headers: string[]; rows: Record<string, any>[] }> {
+): Promise<{ headers: string[]; rows: ExcelRow[] }> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
@@ -33,7 +34,7 @@ export function readFile(
             try {
               const sheetName = workbook.SheetNames[0];
               const worksheet = workbook.Sheets[sheetName];
-              const rows: Record<string, any>[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+              const rows = XLSX.utils.sheet_to_json(worksheet, { defval: '' }) as ExcelRow[];
               const headers = rows.length > 0 ? Object.keys(rows[0]) : [];
               onProgress?.(100);
               resolve({ headers, rows });
@@ -56,7 +57,7 @@ export function readFile(
  * Retorna los valores únicos de una columna dada, ordenados alfabéticamente.
  * Portado directamente de LocalExcelService.getUniqueValues()
  */
-export function getUniqueValues(rows: Record<string, any>[], header: string): string[] {
+export function getUniqueValues(rows: ExcelRow[], header: string): string[] {
   const seen = new Set<string>();
   for (const row of rows) {
     const val = row[header];

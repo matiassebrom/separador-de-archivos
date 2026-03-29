@@ -14,7 +14,7 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { ChatMessage, FilterConfig } from '@/lib/types';
+import { ChatMessage, ExcelRow, FilterConfig } from '@/lib/types';
 import { BotMessage } from './BotMessage';
 import { UserMessage } from './UserMessage';
 import { TypingIndicator } from './TypingIndicator';
@@ -23,7 +23,7 @@ interface Props {
   messages: ChatMessage[];
   activeWidgetId: string | null;
   isTyping: boolean;
-  onFileLoaded: (data: { headers: string[]; rows: Record<string, any>[]; filename: string }) => Promise<void>;
+  onFileLoaded: (data: { headers: string[]; rows: ExcelRow[]; filename: string }) => Promise<void>;
   onColumnChosen: (col: string) => void;
   onFilterChosen: (filter: FilterConfig | null) => void;
   onColumnsChosen: (cols: string[]) => void;

@@ -18,7 +18,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import { ChatMessage, FilterConfig } from '@/lib/types';
+import { ChatMessage, ExcelRow, FilterConfig } from '@/lib/types';
 import { useAppStateContext } from '@/context/AppStateContext';
 import { ChatWindow } from './ChatWindow';
 import { RefreshCw } from 'lucide-react';
@@ -71,7 +71,7 @@ export function ChatPage() {
 
   // ─── Paso 1: archivo subido ─────────────────────────────────────────────────
   const handleFileLoaded = useCallback(
-    async ({ headers, rows, filename }: { headers: string[]; rows: Record<string, any>[]; filename: string }) => {
+    async ({ headers, rows, filename }: { headers: string[]; rows: ExcelRow[]; filename: string }) => {
       dispatch({ type: 'SET_FILE_DATA', payload: { rows, headers, filename } });
 
       addUserMessage(`Subí: ${filename} (${rows.length.toLocaleString()} filas, ${headers.length} columnas)`);

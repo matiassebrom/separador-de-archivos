@@ -13,10 +13,11 @@
 import { useState, useCallback, useRef } from 'react';
 import { UploadCloud } from 'lucide-react';
 import { readFile } from '@/lib/excel';
+import { ExcelRow } from '@/lib/types';
 
 interface FileData {
   headers: string[];
-  rows: Record<string, any>[];
+  rows: ExcelRow[];
   filename: string;
 }
 

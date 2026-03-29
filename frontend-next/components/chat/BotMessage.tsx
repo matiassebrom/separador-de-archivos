@@ -9,7 +9,7 @@
  * Los callbacks son opcionales porque no todos los mensajes tienen widget.
  */
 
-import { ChatMessage, FilterConfig } from '@/lib/types';
+import { ChatMessage, ExcelRow, FilterConfig } from '@/lib/types';
 import { FileDropWidget } from '@/components/widgets/FileDropWidget';
 import { ColumnSelectorWidget } from '@/components/widgets/ColumnSelectorWidget';
 import { FilterWidget } from '@/components/widgets/FilterWidget';
@@ -19,7 +19,7 @@ import { DownloadWidget } from '@/components/widgets/DownloadWidget';
 interface Props {
   message: ChatMessage;
   isActive: boolean;
-  onFileLoaded?: (data: { headers: string[]; rows: Record<string, any>[]; filename: string }) => Promise<void>;
+  onFileLoaded?: (data: { headers: string[]; rows: ExcelRow[]; filename: string }) => Promise<void>;
   onColumnChosen?: (col: string) => void;
   onFilterChosen?: (filter: FilterConfig | null) => void;
   onColumnsChosen?: (cols: string[]) => void;
