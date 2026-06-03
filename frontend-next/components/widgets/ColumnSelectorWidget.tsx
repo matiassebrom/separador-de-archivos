@@ -50,7 +50,7 @@ export function ColumnSelectorWidget({ onColumnChosen }: Props) {
         ))}
       </div>
       {autoSelected && selected.toLowerCase() === 'origen' && (
-        <p className="mono text-[11px] text-mr-blue-hi tracking-[0.4px]">Seleccionado "ORIGEN" por defecto</p>
+        <p className="mono text-[11px] text-mr-blue-hi tracking-[0.4px]">Seleccionado &quot;ORIGEN&quot; por defecto</p>
       )}
       <button
         disabled={!selected}

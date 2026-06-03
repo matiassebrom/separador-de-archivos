@@ -120,7 +120,7 @@ export function FileDropWidget({ onFileLoaded }: Props) {
         </div>
         <div className="px-6 py-4 border-t border-mr-border flex flex-col gap-3 mt-1">
           {autoWasSet && selectedSheet.toLowerCase() === 'raw data' && (
-            <p className="mono text-[11px] text-mr-blue-hi tracking-[0.4px]">Seleccionado "Raw data" por defecto</p>
+            <p className="mono text-[11px] text-mr-blue-hi tracking-[0.4px]">Seleccionado &quot;Raw data&quot; por defecto</p>
           )}
           <button
             disabled={!selectedSheet}
