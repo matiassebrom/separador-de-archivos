@@ -1,5 +1,88 @@
 @import "tailwindcss";
 
-body {
-  font-family: var(--font-inter, Arial, Helvetica, sans-serif);
+:root {
+  --mr-bg:        #0a0a0c;
+  --mr-bg-2:      #111114;
+  --mr-surface:   #16161a;
+  --mr-surface-2: #1c1c21;
+  --mr-surface-3: #22222a;
+  --mr-border:    #26262d;
+  --mr-border-2:  #34343d;
+  --mr-fg:        #f4f4f5;
+  --mr-fg-2:      #d4d4d8;
+  --mr-muted:     #a1a1aa;
+  --mr-muted-2:   #71717a;
+  --mr-dim:       #52525b;
+  --mr-blue:      #2563eb;
+  --mr-blue-hi:   #3b82f6;
+  --mr-blue-lo:   #1d4ed8;
+  --mr-blue-soft: rgba(37,99,235,0.12);
+  --mr-blue-ring: rgba(37,99,235,0.30);
+
+  --mr-header-h:  56px;
+  --mr-sidebar-w: 264px;
+}
+
+@theme {
+  --color-mr-bg: var(--mr-bg);
+  --color-mr-bg-2: var(--mr-bg-2);
+  --color-mr-surface: var(--mr-surface);
+  --color-mr-surface-2: var(--mr-surface-2);
+  --color-mr-surface-3: var(--mr-surface-3);
+  --color-mr-border: var(--mr-border);
+  --color-mr-border-2: var(--mr-border-2);
+  --color-mr-fg: var(--mr-fg);
+  --color-mr-fg-2: var(--mr-fg-2);
+  --color-mr-muted: var(--mr-muted);
+  --color-mr-muted-2: var(--mr-muted-2);
+  --color-mr-dim: var(--mr-dim);
+  --color-mr-blue: var(--mr-blue);
+  --color-mr-blue-hi: var(--mr-blue-hi);
+  --color-mr-blue-lo: var(--mr-blue-lo);
+  --color-mr-blue-soft: var(--mr-blue-soft);
+  --color-mr-blue-ring: var(--mr-blue-ring);
+
+  --font-space: var(--font-space-grotesk), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+}
+
+html, body, #root {
+  margin: 0; padding: 0;
+  height: 100%; width: 100%;
+  background: var(--mr-bg);
+  color: var(--mr-fg);
+  font-family: var(--font-space-grotesk), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+* { box-sizing: border-box; }
+
+.mono {
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+}
+
+.mr-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.mr-scroll::-webkit-scrollbar-thumb {
+  background: var(--mr-border-2);
+  border-radius: 4px;
+}
+.mr-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.mr-scroll {
+  scrollbar-color: var(--mr-border-2) transparent;
+  scrollbar-width: thin;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
 }

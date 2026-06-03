@@ -2,29 +2,40 @@
 import * as XLSX from 'xlsx';
 import { ExcelRow } from './types';
 
-/**
- * Lee un archivo Excel y retorna los headers y filas como objetos.
- * Portado directamente de LocalExcelService.readFile()
- */
+function readArrayBuffer(file: File, onProgress?: (percent: number) => void): Promise<ArrayBuffer> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onprogress = (e) => {
+      if (e.lengthComputable) onProgress?.(Math.round((e.loaded / e.total) * 60));
+    };
+    reader.onload = (e) => resolve(e.target?.result as ArrayBuffer);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+export async function getSheetNames(file: File): Promise<string[]> {
+  const buffer = await readArrayBuffer(file);
+  const workbook = XLSX.read(buffer, { type: 'array' });
+  return workbook.SheetNames;
+}
+
 export function readFile(
   file: File,
   onProgress?: (percent: number) => void,
+  sheetName?: string,
 ): Promise<{ headers: string[]; rows: ExcelRow[] }> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
     reader.onprogress = (e) => {
-      if (e.lengthComputable) {
-        // FileReader cubre 0–60 %
-        onProgress?.(Math.round((e.loaded / e.total) * 60));
-      }
+      if (e.lengthComputable) onProgress?.(Math.round((e.loaded / e.total) * 60));
     };
 
     reader.onload = (e) => {
       onProgress?.(65);
       const data = e.target?.result;
 
-      // setTimeout(0) cede el hilo al browser para que re-pinte antes de parsear
       setTimeout(() => {
         try {
           const workbook = XLSX.read(data, { type: 'array' });
@@ -32,8 +43,8 @@ export function readFile(
 
           setTimeout(() => {
             try {
-              const sheetName = workbook.SheetNames[0];
-              const worksheet = workbook.Sheets[sheetName];
+              const sheet = sheetName ?? workbook.SheetNames[0];
+              const worksheet = workbook.Sheets[sheet];
               const rows = XLSX.utils.sheet_to_json(worksheet, { defval: '' }) as ExcelRow[];
               const headers = rows.length > 0 ? Object.keys(rows[0]) : [];
               onProgress?.(100);
@@ -53,10 +64,6 @@ export function readFile(
   });
 }
 
-/**
- * Retorna los valores únicos de una columna dada, ordenados alfabéticamente.
- * Portado directamente de LocalExcelService.getUniqueValues()
- */
 export function getUniqueValues(rows: ExcelRow[], header: string): string[] {
   const seen = new Set<string>();
   for (const row of rows) {

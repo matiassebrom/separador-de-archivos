@@ -1,35 +1,19 @@
 'use client';
 
-/**
- * MIGRACIÓN de step4-choose-columns.component
- *
- * Angular:  mat-select múltiple con chips para mostrar seleccionados
- * React:    checkboxes con Set<string> en useState + chips renderizados
- *
- * Nota sobre inmutabilidad con Set en React:
- *   NO podés hacer: mySet.add(item); setState(mySet)  ← React no detecta el cambio
- *   SÍ podés hacer: setState(prev => new Set(prev).add(item))  ← nuevo Set = nuevo render
- *
- * Arranca con las columnas por defecto pre-seleccionadas; si ninguna existe en el archivo,
- * cae a todas las columnas.
- */
-
 import { useState, useCallback } from 'react';
 import { useAppStateContext } from '@/context/AppStateContext';
-import { X, Columns } from 'lucide-react';
+import { X } from 'lucide-react';
 
 interface Props {
   onColumnsChosen: (cols: string[]) => void;
 }
 
-// Columnas que se pre-seleccionan por defecto (solo las que existan en el archivo)
 const DEFAULT_COLS = ['ORIGEN', 'ID', 'Q_TerminateFlag'];
 
 export function ColumnChecklist({ onColumnsChosen }: Props) {
   const { state } = useAppStateContext();
   const [checked, setChecked] = useState<Set<string>>(() => {
     const defaults = DEFAULT_COLS.filter((c) => state.headers.includes(c));
-    // Si ninguna columna default existe en el archivo, selecciona todas
     return new Set(defaults.length > 0 ? defaults : state.headers);
   });
   const [search, setSearch] = useState('');
@@ -50,26 +34,25 @@ export function ColumnChecklist({ onColumnsChosen }: Props) {
     h.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Mantener el orden original de headers en las chips
   const checkedInOrder = state.headers.filter((h) => checked.has(h));
 
   return (
-    <div className="mt-2 bg-white border border-gray-200 rounded-xl p-4 shadow-sm space-y-3">
+    <div className="border border-mr-border rounded-[8px] bg-mr-surface p-4 flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <span className="text-xs text-gray-500">
+        <span className="mono text-[11px] text-mr-muted tracking-[0.4px]">
           {checked.size} de {state.headers.length} columnas seleccionadas
         </span>
-        <div className="flex gap-2 text-xs">
+        <div className="flex gap-2 mono text-[11px] tracking-[0.4px]">
           <button
             onClick={() => setChecked(new Set(state.headers))}
-            className="text-blue-500 hover:underline"
+            className="text-mr-blue-hi hover:text-mr-fg cursor-pointer transition-colors"
           >
             Todas
           </button>
-          <span className="text-gray-300">|</span>
+          <span className="text-mr-dim">|</span>
           <button
             onClick={() => setChecked(new Set())}
-            className="text-gray-500 hover:underline"
+            className="text-mr-muted-2 hover:text-mr-fg cursor-pointer transition-colors"
           >
             Ninguna
           </button>
@@ -77,39 +60,38 @@ export function ColumnChecklist({ onColumnsChosen }: Props) {
       </div>
 
       <input
-        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+        className="w-full bg-mr-surface-2 border border-mr-border rounded-[6px] px-3 py-2 text-[14px] text-mr-fg placeholder:text-mr-dim focus:outline-none focus:border-mr-blue-ring focus:ring-1 focus:ring-mr-blue-ring transition-colors"
         placeholder="Buscar columna..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
 
-      <div className="max-h-44 overflow-y-auto space-y-0.5 pr-1">
+      <div className="max-h-44 overflow-y-auto mr-scroll space-y-0.5 pr-1">
         {filteredHeaders.map((h) => (
           <label
             key={h}
-            className="flex items-center gap-2.5 px-2 py-1.5 hover:bg-gray-50 rounded-lg cursor-pointer"
+            className="flex items-center gap-2.5 px-2 py-1.5 hover:bg-mr-surface-2 rounded-[6px] cursor-pointer"
           >
             <input
               type="checkbox"
               checked={checked.has(h)}
               onChange={() => toggle(h)}
-              className="rounded accent-blue-500"
+              className="rounded accent-mr-blue"
             />
-            <span className="text-sm text-gray-700">{h}</span>
+            <span className="text-[14px] text-mr-fg-2">{h}</span>
           </label>
         ))}
       </div>
 
-      {/* Chips de columnas seleccionadas */}
       {checkedInOrder.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 pt-1 border-t border-gray-100">
+        <div className="flex flex-wrap gap-1.5 pt-1 border-t border-mr-border">
           {checkedInOrder.map((h) => (
             <span
               key={h}
-              className="inline-flex items-center gap-1 bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full"
+              className="inline-flex items-center gap-1 bg-mr-blue-soft border border-mr-blue-ring text-[#93c5fd] mono text-[11px] tracking-[0.4px] px-2 py-1 rounded-full"
             >
               {h}
-              <button onClick={() => toggle(h)} className="hover:text-blue-900">
+              <button onClick={() => toggle(h)} className="hover:text-mr-fg cursor-pointer">
                 <X size={10} />
               </button>
             </span>
@@ -120,11 +102,8 @@ export function ColumnChecklist({ onColumnsChosen }: Props) {
       <button
         disabled={checked.size === 0}
         onClick={() => onColumnsChosen(checkedInOrder)}
-        className="w-full bg-blue-500 text-white rounded-lg py-2 text-sm font-medium
-          flex items-center justify-center gap-1.5
-          disabled:opacity-40 disabled:cursor-not-allowed hover:bg-blue-600 transition-colors"
+        className="bg-mr-blue hover:bg-mr-blue-lo text-white rounded-[6px] px-4 py-2 text-[14px] font-medium transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
       >
-        <Columns size={14} />
         Confirmar columnas ({checked.size})
       </button>
     </div>

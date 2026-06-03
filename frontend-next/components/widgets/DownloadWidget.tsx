@@ -1,15 +1,5 @@
 'use client';
 
-/**
- * MIGRACIÓN de step5-download.component
- *
- * Angular:  input de texto + botón, llama LocalExcelService.generateAndDownloadZip()
- * React:    igual, pero llama la función importada de lib/zip.ts
- *
- * La lógica de generación del ZIP es idéntica – solo cambió cómo se llama
- * (función importada en vez de service inyectado).
- */
-
 import { useState } from 'react';
 import { useAppStateContext } from '@/context/AppStateContext';
 import { generateAndDownloadZip } from '@/lib/zip';
@@ -49,70 +39,69 @@ export function DownloadWidget({ onDownloadComplete }: Props) {
     }
   };
 
-  // Preview del nombre de los archivos
   const previewName = state.baseName
     ? `${state.baseName} - ${state.separateBy} - [valor].xlsx`
     : `[nombre] - ${state.separateBy} - [valor].xlsx`;
 
   return (
-    <div className="mt-2 bg-white border border-gray-200 rounded-xl p-4 shadow-sm space-y-4">
-      {/* Resumen de configuración */}
-      <div className="bg-gray-50 rounded-lg p-3 text-xs space-y-1.5">
+    <div className="border border-mr-border rounded-[8px] bg-mr-surface p-4 flex flex-col gap-4">
+      {/* Resumen de configuracion */}
+      <div className="bg-mr-surface-2 border border-mr-border rounded-[8px] p-3 flex flex-col gap-1.5">
         <div className="flex gap-2">
-          <span className="text-gray-400 w-28">Separar por:</span>
-          <span className="font-medium text-gray-700">{state.separateBy}</span>
+          <span className="mono text-[11px] text-mr-muted tracking-[0.4px] w-28">Separar por:</span>
+          <span className="mono text-[11px] text-mr-fg-2 tracking-[0.4px]">{state.separateBy}</span>
         </div>
         {state.filter && (
           <div className="flex gap-2">
-            <span className="text-gray-400 w-28">Filtro activo:</span>
-            <span className="font-medium text-gray-700">
+            <span className="mono text-[11px] text-mr-muted tracking-[0.4px] w-28">Filtro activo:</span>
+            <span className="mono text-[11px] text-mr-fg-2 tracking-[0.4px]">
               {state.filter.header} = {state.filter.values.join(', ')}
             </span>
           </div>
         )}
         <div className="flex gap-2">
-          <span className="text-gray-400 w-28">Columnas:</span>
-          <span className="font-medium text-gray-700">{state.keepCols.length} seleccionadas</span>
+          <span className="mono text-[11px] text-mr-muted tracking-[0.4px] w-28">Columnas:</span>
+          <span className="mono text-[11px] text-mr-fg-2 tracking-[0.4px]">{state.keepCols.length} seleccionadas</span>
         </div>
         <div className="flex gap-2">
-          <span className="text-gray-400 w-28">Filas totales:</span>
-          <span className="font-medium text-gray-700">{state.rows.length}</span>
+          <span className="mono text-[11px] text-mr-muted tracking-[0.4px] w-28">Filas totales:</span>
+          <span className="mono text-[11px] text-mr-fg-2 tracking-[0.4px]">{state.rows.length}</span>
         </div>
       </div>
 
-      {/* Input del nombre base */}
-      <div>
-        <label className="block text-xs font-medium text-gray-500 mb-1.5">
+      {/* Input nombre base */}
+      <div className="flex flex-col gap-1.5">
+        <p className="mono text-[10.5px] text-mr-muted-2 tracking-[1.4px] uppercase">
           Nombre base para los archivos
-        </label>
+        </p>
         <input
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+          className="w-full bg-mr-surface-2 border border-mr-border rounded-[6px] px-3 py-2 text-[14px] text-mr-fg placeholder:text-mr-dim focus:outline-none focus:border-mr-blue-ring focus:ring-1 focus:ring-mr-blue-ring transition-colors disabled:opacity-50"
           value={state.baseName}
           onChange={(e) => dispatch({ type: 'SET_BASE_NAME', payload: e.target.value })}
           placeholder="Ej: Reporte Ventas 2024"
           disabled={done}
         />
-        <p className="text-xs text-gray-400 mt-1.5 font-mono truncate">
+        <p className="mono text-[11px] text-mr-dim tracking-[0.4px] truncate">
           → {previewName}
         </p>
       </div>
 
       {error && (
-        <p className="text-sm text-red-500 bg-red-50 rounded-lg px-3 py-2">{error}</p>
+        <p className="text-[13px] text-[#f87171] bg-[rgba(239,68,68,0.1)] border border-[rgba(239,68,68,0.2)] rounded-[6px] px-3 py-2">
+          {error}
+        </p>
       )}
 
       {done ? (
-        <div className="flex items-center justify-center gap-2 text-green-600 bg-green-50 rounded-lg py-3">
+        <div className="flex items-center justify-center gap-2 text-[#86efac] bg-[rgba(34,197,94,0.12)] border border-[rgba(34,197,94,0.35)] rounded-[8px] py-3">
           <CheckCircle size={18} />
-          <span className="text-sm font-medium">Descarga iniciada con éxito</span>
+          <span className="text-[14px] font-medium">Descarga iniciada con éxito</span>
         </div>
       ) : (
         <button
           onClick={handleDownload}
           disabled={isGenerating || !state.baseName}
-          className="w-full bg-green-500 text-white rounded-lg py-2.5 text-sm font-medium
-            flex items-center justify-center gap-2
-            disabled:opacity-40 disabled:cursor-not-allowed hover:bg-green-600 transition-colors"
+          className="bg-mr-blue hover:bg-mr-blue-lo text-white rounded-[6px] px-4 py-2.5 text-[14px] font-medium flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {isGenerating ? (
             <span className="flex flex-col items-center gap-2 w-full">
@@ -120,7 +109,7 @@ export function DownloadWidget({ onDownloadComplete }: Props) {
                 <Loader2 size={16} className="animate-spin" />
                 Generando archivos... {progress}%
               </span>
-              <span className="w-full bg-green-400/40 rounded-full h-1.5">
+              <span className="w-full bg-mr-blue-lo rounded-full h-1.5">
                 <span
                   className="block bg-white rounded-full h-1.5 transition-all duration-200"
                   style={{ width: `${progress}%` }}

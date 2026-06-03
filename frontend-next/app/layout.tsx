@@ -1,27 +1,22 @@
-/**
- * layout.tsx – Server Component (NO tiene 'use client')
- *
- * MIGRACIÓN: equivale al app.config.ts + index.html de Angular.
- *
- * Es el punto de entrada de la app. Acá:
- *   - Se configuran metadatos (título, descripción)
- *   - Se elige la fuente
- *   - Se envuelve todo en AppStateProvider (el "proveedor global" de estado)
- *
- * AppStateProvider es un Client Component, pero puede ser importado y renderizado
- * desde un Server Component sin problema. Next.js sabe qué corre en el servidor
- * y qué en el browser según el 'use client' en cada archivo.
- */
-
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AppStateProvider } from "@/context/AppStateContext";
 
-const inter = Inter({ subsets: ["latin"] });
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+});
 
 export const metadata: Metadata = {
-  title: "Split & Filter Excel",
+  title: "Separador de Excel",
   description: "Dividí y filtrá archivos Excel fácilmente, paso a paso",
 };
 
@@ -31,8 +26,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es">
-      <body className={`${inter.className} antialiased bg-gray-100 min-h-screen`}>
+    <html lang="es" className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full antialiased`}>
+      <body className="h-full bg-mr-bg text-mr-fg font-space overflow-hidden">
         <AppStateProvider>
           {children}
         </AppStateProvider>
